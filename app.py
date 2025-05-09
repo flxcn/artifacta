@@ -16,7 +16,7 @@ TEMPLATE = '''
 <!doctype html>
 <html lang="en">
 <head>
-    <title>perse</title>
+    <title>Artifacta</title>
     <style>
         body { font-family: Arial; margin: 50px; line-height: 1.6; }
         .interests-container { margin: 20px 0; padding: 15px; background: #f8f8f8; border-radius: 5px; }
@@ -27,26 +27,12 @@ TEMPLATE = '''
     </style>
 </head>
 <body>
-    <h1>Harvard Art Museums Persé</h1>
+    <h1>Artifacta</h1>
+    <p>Powered by the Harvard Art Museums and Anthropic's Claude</p>
     <form method="POST">
         <label for="object_id">Enter Object ID:</label>
         <input type="text" name="object_id" required value="{{ object_id or '' }}">
-        
-        {% if image_url %}
-        <div class="interests-container">
-            <h3>What aspects are you interested in learning more about?</h3>
-            <div class="interest-options">
-                <label class="interest-option"><input type="checkbox" name="interests" value="artistic_technique" {% if 'artistic_technique' in interests %}checked{% endif %}> Artistic Technique</label>
-                <label class="interest-option"><input type="checkbox" name="interests" value="historical_context" {% if 'historical_context' in interests %}checked{% endif %}> Historical Context</label>
-                <label class="interest-option"><input type="checkbox" name="interests" value="symbolism" {% if 'symbolism' in interests %}checked{% endif %}> Symbolism & Meaning</label>
-                <label class="interest-option"><input type="checkbox" name="interests" value="artist_biography" {% if 'artist_biography' in interests %}checked{% endif %}> Artist Biography</label>
-                <label class="interest-option"><input type="checkbox" name="interests" value="ownership_journey" {% if 'ownership_journey' in interests %}checked{% endif %}> Ownership Journey</label>
-                <label class="interest-option"><input type="checkbox" name="interests" value="cultural_impact" {% if 'cultural_impact' in interests %}checked{% endif %}> Cultural Impact</label>
-            </div>
-        </div>
-        {% endif %}
-        
-        <input type="submit" value="{% if image_url %}Update Story{% else %}Generate Story{% endif %}">
+        <input type="submit" value="{% if image_url %}Generate Ranking{% else %}Generate Ranking{% endif %}">
     </form>
 
     {% if image_url %}
@@ -88,9 +74,9 @@ def fetch_art_data(object_id):
             }
     return None
 
-def create_claude_prompt(art, interests=None):
+def create_claude_prompt(art):
     base_prompt = f"""
-You are an art historian and creative storyteller.
+You are an art historian and expert on the Crusades.
 
 Here is an image of an artwork from the Harvard Art Museums: {art['image_url']}
 
@@ -101,15 +87,11 @@ Culture: {art['culture']}
 Medium: {art['medium']}
 
 Provenance: {art['provenance']}
+
 """
 
-    if interests and len(interests) > 0:
-        base_prompt += f"\nThe viewer is particularly interested in learning about these aspects: {', '.join(interests)}.\n"
-    
     base_prompt += """
-Please tell me a vivid and historically grounded story about the artwork — how it might have been created, who owned it, and what it has seen. Use the provenance details as anchors in the timeline, but feel free to interpret and imagine. Capture the emotional resonance, cultural shifts, and the significance of each chapter in the painting's journey.
-
-End with a reflection on what the painting means now, and what it might be thinking as it hangs in the Harvard Art Museums.
+Rate this object on a scale of 1-10 in terms of its relevance to the Crusades, with 1 being least relevant and 10 being most relevant. Explain your reasoning.
 """
     return base_prompt
 
@@ -154,7 +136,7 @@ def index():
         
         art = fetch_art_data(object_id)
         if art and art['image_url']:
-            prompt = create_claude_prompt(art, interests)
+            prompt = create_claude_prompt(art)
             story = call_claude(prompt)
             image_url = art['image_url']
             title = art['title']
