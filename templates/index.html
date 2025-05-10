@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>Artifacta</title>
+  <style>
+    body {
+      font-family: 'EB Garamond', serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f0dc; /* Parchment tone */
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 30px;
+      background-color: #fffef9;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    h1, h2, h3 {
+      color: #333;
+      text-align: center;
+    }
+
+    form {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    input[type="text"] {
+      padding: 8px;
+      width: 200px;
+    }
+
+    input[type="submit"] {
+      padding: 8px 16px;
+      background-color: #ddd2b4;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    p {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Artifacta</h1>
+    <p style="text-align:center;">Powered by the Harvard Art Museums and Anthropic's Claude</p>
+    
+    <form method="POST">
+      <label for="object_id">Object ID:</label>
+      <input type="text" name="object_id" required value="{{ object_id or '' }}">
+      <input type="submit" value="{% if image_url %}Generate Ranking{% else %}Generate Ranking{% endif %}">
+    </form>
+
+    {% if image_url %}
+      <h2>{{ title }} ({{ dated }})</h2>
+      <p><strong>Artist:</strong> {{ artist }}<br>
+         <strong>Culture:</strong> {{ culture }}<br>
+         <strong>Medium:</strong> {{ medium }}</p>
+      <img src="{{ image_url }}" alt="Art Image">
+      <h3>Provenance</h3>
+      <p>{{ provenance }}</p>
+      <h3>Explanation</h3>
+      <p style="white-space: pre-line;">{{ story }}</p>
+    {% elif error %}
+      <p style="color: red; text-align: center;">{{ error }}</p>
+    {% endif %}
+  </div>
+</body>
+</html>
