@@ -4,6 +4,7 @@ import time
 import pandas as pd
 from tqdm import tqdm
 import os
+from dotenv import load_dotenv
 
 def get_harvard_art_collection(api_key, max_objects=75000):
     """
@@ -16,14 +17,14 @@ def get_harvard_art_collection(api_key, max_objects=75000):
     page_size = 100  # Harvard API allows up to 100 objects per request
     total_objects = 0
     
-    print("Fetching European and American Art collections from Harvard Art Museums API...")
+    print("Fetching collections from Harvard Art Museums API...")
     
     # Using the specific key "European and American Art" as requested
     params = {
         'apikey': api_key,
         'size': page_size,
         'page': page,
-        'division': 'European and American Art',  # Using the exact key specified
+        'division': 'Asian and Mediterranean Art',  # Using the exact key specified
         'sort': 'rank',
         'sortorder': 'desc',
         'fields': 'id,objectnumber,title,people,dated,datebegin,dateend,period,culture,technique,medium,dimensions,provenance,department,division,creditline,classification,gallery,century,style,url,primaryimageurl,colors,images,imagepermissionlevel'
@@ -140,7 +141,7 @@ def process_object_data(objects):
     
     return processed_objects
 
-def save_to_csv(objects, filename="harvard_european_american_art.csv"):
+def save_to_csv(objects, filename="harvard_asian_med_art.csv"):
     """
     Save the processed collection data to a CSV file
     """
@@ -213,12 +214,14 @@ def verify_division_exists(api_key, division_name):
 
 def main():
     # Get API key from environment or prompt user
-    api_key = os.environ.get("HARVARD_API_KEY")
+    # Load API key from .env
+    load_dotenv()
+    api_key = os.getenv('HARVARD_API_KEY')
     if not api_key:
         api_key = input("Enter your Harvard Art Museums API key: ")
     
     # Division name to use for filtering
-    division_name = "European and American Art"
+    division_name = "Asian and Mediterranean Art"
     
     # Verify the division exists
     verify_division_exists(api_key, division_name)
