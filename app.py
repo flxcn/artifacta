@@ -13,10 +13,10 @@ CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages'
 API_URL = 'https://api.harvardartmuseums.org/object'
 
 
-def fetch_art_data(object_id):
+def fetch_art_data(object_number):
     params = {
         'apikey': HARVARD_API_KEY,
-        'q': f'id:{object_id}'
+        'objectnumber': object_number
     }
     response = requests.get(API_URL, params=params)
     if response.status_code == 200:
@@ -82,14 +82,14 @@ def call_claude(prompt):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     image_url = error = title = artist = dated = culture = medium = provenance = story = None
-    object_id = None
+    object_number = None
     interests = []
 
     if request.method == 'POST':
-        object_id = request.form['object_id']
+        object_number = request.form['object_number']
         interests = request.form.getlist('interests')
         
-        art = fetch_art_data(object_id)
+        art = fetch_art_data(object_number)
         if art and art['image_url']:
             prompt = create_claude_prompt(art)
             story = call_claude(prompt)
@@ -113,7 +113,7 @@ def index():
                            provenance=provenance, 
                            story=story, 
                            error=error,
-                           object_id=object_id,
+                           object_number=object_number,
                            interests=interests)
 
 if __name__ == '__main__':
